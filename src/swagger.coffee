@@ -265,23 +265,16 @@ class SwaggerModel
     strong = '<span class="strong">';
     stronger = '<span class="stronger">';
     strongClose = '</span>';
-    classOpen = strong + @name + ' {' + strongClose
-    classClose = strong + '}' + strongClose
-    returnVal = classOpen + '<div>' + propertiesStr.join(',</div><div>') + '</div>' + classClose
+    classOpen = '<span class="folded" style="display: none"> { &#8230; }</span> <span class="block" id="' + this.name + '">' + '{';
+    returnVal = classOpen + '<div class="field">' + propertiesStr.join(',</div><div class="field">') + '</div>';
 
     # create the array if necessary and then add the current element
     if !modelsToIgnore
       modelsToIgnore = []
     modelsToIgnore.push(@)
 
-    # iterate thru all properties and add models which are not in modelsToIgnore
-    # modelsToIgnore is used to ensure that recursive references do not lead to endless loop
-    # and that the same model is not displayed multiple times
-    for prop in @properties
-      if(prop.refModel? and (modelsToIgnore.indexOf(prop.refModel)) == -1)
-        returnVal = returnVal + ('<br>' + prop.refModel.getMockSignature(modelsToIgnore))
-
-    returnVal
+    classClose = '}' + '</span>' ;
+    return returnVal + classClose;
 
   createJSONSample: (modelToIgnore) ->
     result = {}
@@ -321,16 +314,13 @@ class SwaggerModelProperty
   toString: ->
     req = if @required then 'propReq' else 'propOpt'
 
-    str = '<span class="propName ' + req + '">' + @name + '</span> (<span class="propType">' + @dataTypeWithRef + '</span>';
+    str = '<span class="propName ' + req + '" data-toggle="tooltip" title="' + (@.descr or '') + '">' + @.name + '</span> (<span class="' + (if @.refModel then '' else 'propType') + '">' +  ( if @.refModel then this.refModel.getMockSignature([]) else @.dataTypeWithRef) + '</span>'
     if !@required
       str += '<span class="propOptKey">, optional</span>'
 
     str += ')';
     if @values?
       str += " = <span class='propVals'>['" + @values.join("' or '") + "']</span>"
-
-    if @descr?
-      str += ': <span class="propDesc">' + @descr + '</span>'
 
     str
 
