@@ -323,7 +323,7 @@ class SwaggerModelProperty
 
     str = '<span class="propName ' + req + '">' + @name + '</span> (<span class="propType">' + @dataTypeWithRef + '</span>';
     if !@required
-      str += ', <span class="propOptKey">optional</span>'
+      str += '<span class="propOptKey">, optional</span>'
 
     str += ')';
     if @values?
